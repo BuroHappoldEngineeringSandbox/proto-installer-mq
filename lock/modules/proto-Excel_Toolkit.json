@@ -3,14 +3,14 @@
     "core": null,
     "deps": {
       "proto-BHoM": "be891e99-bf315cc9",
-      "proto-BHoM_Adapter": "dd15124d-e1199e2e",
+      "proto-BHoM_Adapter": "de73b902-e1199e2e",
       "proto-BHoM_Engine": "e2fa495d-f8e6169a"
     }
   },
   "ok": true,
   "sha": "06cc5263e58c83fed93e44f77c5e75179edbf9dd",
-  "sha256": "cf1b3e2809f6d15bcdc4f56795b1a00d7b76163adaf0a80858187779e3f24d36",
+  "sha256": "2efbd7eb148858fee09ff0466cb71868d801427385ef5e98c7ded2ebe01a1e8d",
   "source": "integrator-rebuild",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-Excel_Toolkit-06cc5263-dbc1c1c9/proto-Excel_Toolkit.zip",
-  "version": "06cc5263-dbc1c1c9"
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-Excel_Toolkit-06cc5263-8b3a8bcd/proto-Excel_Toolkit.zip",
+  "version": "06cc5263-8b3a8bcd"
 }

@@ -3,15 +3,15 @@
     "core": null,
     "deps": {
       "proto-BHoM": "be891e99-bf315cc9",
-      "proto-BHoM_Adapter": "dd15124d-e1199e2e",
+      "proto-BHoM_Adapter": "de73b902-e1199e2e",
       "proto-BHoM_Engine": "e2fa495d-f8e6169a",
-      "proto-Excel_Toolkit": "06cc5263-dbc1c1c9"
+      "proto-Excel_Toolkit": "06cc5263-8b3a8bcd"
     }
   },
   "ok": true,
   "sha": "d839764291487156d52b979af0fe129210dbcb2e",
-  "sha256": "0d94819eb188194914c6e4d91bb943d06b24b7ad71854a20af45936659e8e470",
+  "sha256": "f7a07896dd2415b633554551757d71f5f067f5db7318cdd21454c6de8f6b2090",
   "source": "integrator-rebuild",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-PowerPoint_Toolkit-d8397642-31e4e5d0/proto-PowerPoint_Toolkit.zip",
-  "version": "d8397642-31e4e5d0"
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-PowerPoint_Toolkit-d8397642-4e8a5c08/proto-PowerPoint_Toolkit.zip",
+  "version": "d8397642-4e8a5c08"
 }

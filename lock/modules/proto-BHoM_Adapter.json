@@ -7,9 +7,9 @@
     }
   },
   "ok": true,
-  "sha": "dd15124dd69b47de3a55b409beed7e2924702abd",
-  "sha256": "ddc6423ba79c425d3789c5edab1a396b31476db93c63e4e26d9fd3258e4de05a",
-  "source": "integrator-release",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Adapter-dd15124d-e1199e2e/proto-BHoM_Adapter.zip",
-  "version": "dd15124d-e1199e2e"
+  "sha": "de73b902b397dea79036269f3d992936282fc178",
+  "sha256": "476b2443106d6949c8b4ae977e2fb38fadbc4de30601068e0e7b127dae155d90",
+  "source": "module-release",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM_Adapter/releases/download/m-de73b902-e1199e2e/proto-BHoM_Adapter.zip",
+  "version": "de73b902-e1199e2e"
 }
