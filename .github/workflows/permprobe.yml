@@ -40,7 +40,8 @@ jobs:
           PR: ${{ inputs.pr }}
           R: BuroHappoldEngineeringSandbox/proto-installer-mq
         run: |
-          state() { GH_TOKEN=$T_FULL gh pr view $PR -R $R --json autoMergeRequest,isInMergeQueue,state --jq '"autoMerge=\(.autoMergeRequest!=null) inQueue=\(.isInMergeQueue) state=\(.state)"'; }
+          set +e
+          state() { GH_TOKEN=$T_FULL gh api graphql -f query='query($n:Int!){repository(owner:"BuroHappoldEngineeringSandbox",name:"proto-installer-mq"){pullRequest(number:$n){state isInMergeQueue autoMergeRequest{enabledAt}}}}' -F n=$PR --jq '.data.repository.pullRequest|"state=\(.state) inQueue=\(.isInMergeQueue) autoMerge=\(.autoMergeRequest!=null)"'; }
           echo "PROBE start: $(state)"
           for t in PR MQ; do
             tok=T_$t
