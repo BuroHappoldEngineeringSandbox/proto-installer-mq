@@ -1,0 +1,15 @@
+name: lock-check
+on:
+  pull_request:
+    branches: ['lock-*']
+  merge_group: {}
+permissions:
+  contents: read
+jobs:
+  lock-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: python3 scripts/mq.py check --dir lock --labels "$LABELS"

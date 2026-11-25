@@ -1,0 +1,28 @@
+name: timer
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  timer:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+      - shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          APP_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          python scripts/mq.py compute --kind timer --policies e
+          if ($LASTEXITCODE -ne 0) { throw "timer failed" }
