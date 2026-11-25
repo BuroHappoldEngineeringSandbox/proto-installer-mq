@@ -8,9 +8,9 @@
     }
   },
   "ok": true,
-  "sha": "06cc5263e58c83fed93e44f77c5e75179edbf9dd",
-  "sha256": "cf1b3e2809f6d15bcdc4f56795b1a00d7b76163adaf0a80858187779e3f24d36",
-  "source": "integrator-rebuild",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-Excel_Toolkit-06cc5263-dbc1c1c9/proto-Excel_Toolkit.zip",
-  "version": "06cc5263-dbc1c1c9"
+  "sha": "6d508379394a418b4c3a240302254de9903d2ec5",
+  "sha256": "3f6ac458e980ad856bb4ff37a287b26cbd501869e68a9e21d65537c6068b863d",
+  "source": "integrator-release",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-Excel_Toolkit-6d508379-dbc1c1c9/proto-Excel_Toolkit.zip",
+  "version": "6d508379-dbc1c1c9"
 }
