@@ -1,0 +1,14 @@
+{
+  "built_against": {
+    "core": null,
+    "deps": {
+      "proto-BHoM": "be891e99-bf315cc9"
+    }
+  },
+  "ok": true,
+  "sha": "e2fa495d2c8de948833d93f19fe57767d42ad882",
+  "sha256": "22b5a73c63ef4368d9078e4a7e1793823337a15526f660a76ac43f809c8e1355",
+  "source": "module-release",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM_Engine/releases/download/m-e2fa495d-f8e6169a/proto-BHoM_Engine.zip",
+  "version": "e2fa495d-f8e6169a"
+}
