@@ -15,6 +15,10 @@ on:
       policies:
         required: false
         default: 'a,d,e'
+      no_enqueue:
+        description: TEST ONLY. Open the PR but do not queue it (permission probe)
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -41,6 +45,7 @@ jobs:
           KIND: ${{ github.event.action || inputs.kind }}
           MODULE: ${{ github.event.client_payload.module || inputs.module }}
           POLICIES: ${{ github.event.client_payload.policies || inputs.policies || 'a,d,e' }}
+          NO_ENQUEUE: ${{ inputs.no_enqueue == true && 'true' || 'false' }}
         run: |
           python scripts/mq.py compute --kind $env:KIND --module "$env:MODULE" --policies $env:POLICIES
           if ($LASTEXITCODE -ne 0) { throw "compute failed" }

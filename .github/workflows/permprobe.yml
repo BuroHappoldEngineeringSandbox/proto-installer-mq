@@ -1,0 +1,55 @@
+name: permprobe
+run-name: permprobe PR ${{ inputs.pr }}
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        required: true
+permissions: {}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - id: pr_only
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-pull-requests: write
+      - id: mq_only
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-merge-queues: write
+      - id: full
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+      - env:
+          T_PR: ${{ steps.pr_only.outputs.token }}
+          T_MQ: ${{ steps.mq_only.outputs.token }}
+          T_FULL: ${{ steps.full.outputs.token }}
+          PR: ${{ inputs.pr }}
+          R: BuroHappoldEngineeringSandbox/proto-installer-mq
+        run: |
+          state() { GH_TOKEN=$T_FULL gh pr view $PR -R $R --json autoMergeRequest,isInMergeQueue,state --jq '"autoMerge=\(.autoMergeRequest!=null) inQueue=\(.isInMergeQueue) state=\(.state)"'; }
+          echo "PROBE start: $(state)"
+          for t in PR MQ; do
+            tok=T_$t
+            out=$(GH_TOKEN=${!tok} gh pr merge $PR -R $R --auto 2>&1); rc=$?
+            echo "PROBE token=${t}_only rc=$rc out=$out"
+            echo "PROBE after ${t}_only: $(state)"
+            if [ $rc -eq 0 ]; then
+              d=$(GH_TOKEN=$T_FULL gh pr merge $PR -R $R --disable-auto 2>&1); echo "PROBE undo (disable-auto) rc=$? out=$d"
+              echo "PROBE after undo: $(state)"
+            fi
+          done
+          out=$(GH_TOKEN=$T_FULL gh pr merge $PR -R $R --auto 2>&1); echo "PROBE token=full rc=$? out=$out"; echo "PROBE final: $(state)"

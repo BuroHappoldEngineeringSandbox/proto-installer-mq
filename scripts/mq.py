@@ -194,6 +194,9 @@ def open_pr(branch: str, base_dir: Path, lock: dict, state: dict, title: str, me
     number = int(out.strip().rsplit("/", 1)[-1])
     for lab in labels:
         run(["gh", "pr", "edit", str(number), "-R", f"{OWNER}/{REPO}", "--add-label", lab])
+    if enqueue and os.environ.get("NO_ENQUEUE") == "true":
+        print(json.dumps({"enqueue": number, "skipped": "NO_ENQUEUE (permission probe)"}))
+        enqueue = False
     if enqueue:
         r = subprocess.run(["gh", "pr", "merge", str(number), "-R", f"{OWNER}/{REPO}", "--auto"],
                            capture_output=True, text=True)
