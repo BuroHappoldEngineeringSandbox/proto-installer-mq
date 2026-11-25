@@ -8,9 +8,9 @@
     }
   },
   "ok": true,
-  "sha": "0640b648c255c9d581cea897c952e9ed8845b62d",
-  "sha256": "23e37aa52955ba279cf0486a2c93e4498f75547ec28af179b9a7d83f163836c6",
+  "sha": "b5008d7859afb8bf013dcb21ae6ddbc0f280b1c7",
+  "sha256": "0f3ae15188f3726acc4e278c3c948d40d5bba7889725eeed940196e6981cebcc",
   "source": "module-release",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-0640b648-dbc1c1c9/proto-HTTP_Toolkit.zip",
-  "version": "0640b648-dbc1c1c9"
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-HTTP_Toolkit/releases/download/m-b5008d78-dbc1c1c9/proto-HTTP_Toolkit.zip",
+  "version": "b5008d78-dbc1c1c9"
 }
