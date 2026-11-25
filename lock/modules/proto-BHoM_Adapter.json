@@ -1,0 +1,15 @@
+{
+  "built_against": {
+    "core": null,
+    "deps": {
+      "proto-BHoM": "be891e99-bf315cc9",
+      "proto-BHoM_Engine": "e2fa495d-f8e6169a"
+    }
+  },
+  "ok": true,
+  "sha": "dd15124dd69b47de3a55b409beed7e2924702abd",
+  "sha256": "ddc6423ba79c425d3789c5edab1a396b31476db93c63e4e26d9fd3258e4de05a",
+  "source": "integrator-release",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-BHoM_Adapter-dd15124d-e1199e2e/proto-BHoM_Adapter.zip",
+  "version": "dd15124d-e1199e2e"
+}
