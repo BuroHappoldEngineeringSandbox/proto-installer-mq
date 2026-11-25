@@ -9,9 +9,9 @@
     }
   },
   "ok": true,
-  "sha": "1e03cd1742d2cdb957de3a5d2029e2a367e25eaa",
-  "sha256": "83effe16b27022574606a4e2cdf17c46645b15184c7c234a0366e5b5a21bc401",
-  "source": "integrator-release",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-lock/releases/download/a-proto-PowerPoint_Toolkit-1e03cd17-37958277/proto-PowerPoint_Toolkit.zip",
-  "version": "1e03cd17-37958277"
+  "sha": "d839764291487156d52b979af0fe129210dbcb2e",
+  "sha256": "d2f31231e47a10831209da0deab2a5afb74777d40392cb1732560bf1472b63f4",
+  "source": "integrator-rebuild",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-PowerPoint_Toolkit-d8397642-37958277/proto-PowerPoint_Toolkit.zip",
+  "version": "d8397642-37958277"
 }
