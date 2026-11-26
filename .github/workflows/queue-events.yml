@@ -2,7 +2,9 @@ name: queue-events
 run-name: queue-events ${{ github.event.action }} #${{ github.event.pull_request.number }}
 on:
   pull_request:
-    types: [dequeued, closed]
+    # dequeued removed (MQ2 fix): removal events come from github-merge-queue[bot] and stall in
+    # action_required; the sweep handles removals instead.
+    types: [closed]
     branches: ['lock-*']
 permissions:
   contents: read
