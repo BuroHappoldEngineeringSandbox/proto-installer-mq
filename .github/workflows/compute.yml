@@ -15,32 +15,62 @@ on:
       policies:
         required: false
         default: 'a,d,e'
+      no_enqueue:
+        description: TEST ONLY. Open the PR but do not queue it (permission probe)
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
   compute:
+    strategy:
+      fail-fast: false
+      matrix:
+        policy: [a, d, e]
+    # One compute per lock branch at a time, queued, never cancelled (MQ2 fix).
+    concurrency:
+      group: lock-${{ matrix.policy }}
+      queue: max
     runs-on: windows-2025
     steps:
-      - uses: actions/checkout@v4
+      - id: want
+        shell: pwsh
+        env:
+          POLICIES: ${{ github.event.client_payload.policies || inputs.policies || 'a,d,e' }}
+        run: |
+          $want = ($env:POLICIES -split ',' | ForEach-Object { $_.Trim() }) -contains '${{ matrix.policy }}'
+          "run=$($want.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+      - if: steps.want.outputs.run == 'true'
+        uses: actions/checkout@v4
         with:
           ref: main
-      - uses: actions/setup-dotnet@v4
+      - if: steps.want.outputs.run == 'true'
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - id: app
+      - if: steps.want.outputs.run == 'true'
+        id: app
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
           private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
           owner: BuroHappoldEngineeringSandbox
           repositories: proto-installer-mq
-      - shell: pwsh
+      - if: steps.want.outputs.run == 'true'
+        shell: pwsh
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           APP_TOKEN: ${{ steps.app.outputs.token }}
           KIND: ${{ github.event.action || inputs.kind }}
           MODULE: ${{ github.event.client_payload.module || inputs.module }}
-          POLICIES: ${{ github.event.client_payload.policies || inputs.policies || 'a,d,e' }}
+          NO_ENQUEUE: ${{ inputs.no_enqueue == true && 'true' || 'false' }}
         run: |
-          python scripts/mq.py compute --kind $env:KIND --module "$env:MODULE" --policies $env:POLICIES
+          python scripts/mq.py compute --kind $env:KIND --module "$env:MODULE" --policies ${{ matrix.policy }}
           if ($LASTEXITCODE -ne 0) { throw "compute failed" }
+      - if: always() && steps.want.outputs.run == 'true' && steps.app.outcome == 'success'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          gh api repos/BuroHappoldEngineeringSandbox/proto-installer-mq/dispatches -f event_type=sweep
+          if ($LASTEXITCODE -ne 0) { throw "sweep dispatch failed" }
