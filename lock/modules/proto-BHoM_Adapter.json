@@ -7,9 +7,9 @@
     }
   },
   "ok": true,
-  "sha": "dd15124dd69b47de3a55b409beed7e2924702abd",
-  "sha256": "fb04c9a054ec64d8ef610c196b018cdbb79583dc2ca6bf47e826a1ff80e052df",
+  "sha": "de73b902b397dea79036269f3d992936282fc178",
+  "sha256": "3a6c39740ede5439298593bd6043c01334840911473499a03fd9055c47c61d8b",
   "source": "integrator-rebuild",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-BHoM_Adapter-dd15124d-0d169527/proto-BHoM_Adapter.zip",
-  "version": "dd15124d-0d169527"
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-BHoM_Adapter-de73b902-0d169527/proto-BHoM_Adapter.zip",
+  "version": "de73b902-0d169527"
 }
