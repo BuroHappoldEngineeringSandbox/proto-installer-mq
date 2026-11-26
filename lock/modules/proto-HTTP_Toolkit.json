@@ -2,15 +2,15 @@
   "built_against": {
     "core": null,
     "deps": {
-      "proto-BHoM": "be891e99-bf315cc9",
-      "proto-BHoM_Adapter": "dd15124d-e1199e2e",
-      "proto-BHoM_Engine": "e2fa495d-f8e6169a"
+      "proto-BHoM": "54e4a4cc-bf315cc9",
+      "proto-BHoM_Adapter": "dd15124d-0d169527",
+      "proto-BHoM_Engine": "e2fa495d-d95956c9"
     }
   },
   "ok": true,
   "sha": "b5008d7859afb8bf013dcb21ae6ddbc0f280b1c7",
-  "sha256": "3ac82839c5df15fc125e67c5281e56bd378b78f2eb23a3f93354e156b6f91f44",
+  "sha256": "0083b257afaae02c2c37f38a7ff413ed91311d919c8e601a3613442ab98df42f",
   "source": "integrator-rebuild",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-HTTP_Toolkit-b5008d78-dbc1c1c9/proto-HTTP_Toolkit.zip",
-  "version": "b5008d78-dbc1c1c9"
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-HTTP_Toolkit-b5008d78-f23a0c8a/proto-HTTP_Toolkit.zip",
+  "version": "b5008d78-f23a0c8a"
 }

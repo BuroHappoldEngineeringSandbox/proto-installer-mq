@@ -4,9 +4,9 @@
     "deps": {}
   },
   "ok": true,
-  "sha": "be891e991dcdfd0dc2fcb04bac89504b6a0ff659",
-  "sha256": "ad591d24f1e394a4fb2d46a53f9f706a36a30287ab5657dc096d252689248297",
-  "source": "module-release",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM/releases/download/m-be891e99-bf315cc9/proto-BHoM.zip",
-  "version": "be891e99-bf315cc9"
+  "sha": "54e4a4ccf42e81369c076f2652e24366c8636e5f",
+  "sha256": "854638e13394ac1c0ea04828319f22e8403628619f9cd70435629d448514b20b",
+  "source": "integrator-rebuild",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-BHoM-54e4a4cc-bf315cc9/proto-BHoM.zip",
+  "version": "54e4a4cc-bf315cc9"
 }
