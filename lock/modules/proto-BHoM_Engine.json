@@ -6,9 +6,9 @@
     }
   },
   "ok": true,
-  "sha": "e2fa495d2c8de948833d93f19fe57767d42ad882",
-  "sha256": "22b5a73c63ef4368d9078e4a7e1793823337a15526f660a76ac43f809c8e1355",
-  "source": "module-release",
-  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-BHoM_Engine/releases/download/m-e2fa495d-f8e6169a/proto-BHoM_Engine.zip",
-  "version": "e2fa495d-f8e6169a"
+  "sha": "fd5ae5edcefc93d6a2f1b5ee268baf42b4831bba",
+  "sha256": "2a0c6c37f33358c60b162d4cf81ceffc022d8a62eade8b3a3f13f9f4c197ee51",
+  "source": "integrator-release",
+  "url": "https://github.com/BuroHappoldEngineeringSandbox/proto-installer-mq/releases/download/a-proto-BHoM_Engine-fd5ae5ed-f8e6169a/proto-BHoM_Engine.zip",
+  "version": "fd5ae5ed-f8e6169a"
 }
