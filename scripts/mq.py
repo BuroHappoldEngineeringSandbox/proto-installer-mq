@@ -203,7 +203,24 @@ def open_pr(branch: str, base_dir: Path, lock: dict, state: dict, title: str, me
         print(json.dumps({"enqueue": number, "rc": r.returncode, "out": (r.stdout + r.stderr).strip()}))
         if r.returncode != 0:
             raise RuntimeError(f"enqueue of #{number} failed: {r.stderr.strip()}")
+        if branch in serial_branches():
+            # MQ2 variant: no merge queue on this branch; hold the branch's concurrency slot
+            # until this PR merges or closes, so at most one lock PR is open at a time.
+            deadline = time.time() + 20 * 60
+            while time.time() < deadline:
+                st = api(f"repos/{OWNER}/{REPO}/pulls/{number}")
+                if st.get("merged_at") or st["state"] != "open":
+                    print(json.dumps({"serial_wait": number, "merged": bool(st.get("merged_at"))}))
+                    break
+                time.sleep(15)
+            else:
+                print(f"::warning::serial wait for #{number} timed out")
     return number
+
+
+def serial_branches() -> set[str]:
+    f = Path(__file__).resolve().parent.parent / "config" / "serial-branches.txt"
+    return {x.strip() for x in f.read_text().splitlines() if x.strip()} if f.exists() else set()
 
 
 def compute(policy: str, module: str, kind: str, work: Path) -> dict:
@@ -228,6 +245,18 @@ def compute(policy: str, module: str, kind: str, work: Path) -> dict:
                     meta, f"E hold of {HOLD_MINUTES} min expired for #{h['pr']}. Supersedes #{h['pr']} when merged.", ["lock-update"], True)
         return dict(rec, outcome=res["outcome"], pr=n, supersedes=h["pr"])
     sha = I.head_of(module)
+    # Dedupe (MQ2 fix): one open, non-held proposal per module per branch.
+    for p in open_prs(branch):
+        if any(l["name"] == "held" for l in p["labels"]):
+            continue
+        pm = meta_of(p["body"])
+        if pm.get("event_module") != module:
+            continue
+        if pm.get("changes", {}).get(module) == sha:
+            return dict(rec, outcome=f"skip: {module}@{sha[:8]} already proposed in #{p['number']}")
+        run(["gh", "pr", "close", str(p["number"]), "-R", f"{OWNER}/{REPO}", "--comment",
+             f"Superseded: {module} has a newer head ({sha[:8]}); recomputing."], check=False)
+        rec.setdefault("superseded_open", []).append(p["number"])
     if lock["modules"].get(module, {}).get("sha") == sha:
         return dict(rec, outcome=f"skip: {module}@{sha[:8]} already in lock-{policy}")
     if any(h["sha"] == sha and u == module for u, h in held.items()):
@@ -317,6 +346,48 @@ def removal_reason(number: int) -> str:
         return f"unavailable ({exc}): {out[:200]}"
 
 
+def sweep(policies: list[str]) -> list[dict]:
+    """Reconcile (MQ2 fix): replaces the dequeued-event handler, whose runs stall in
+    action_required because github-merge-queue[bot] triggers them. Finds open, non-held lock
+    PRs that are not progressing and recomputes them."""
+    q = ('query($o:String!,$r:String!,$b:String!){repository(owner:$o,name:$r){pullRequests(first:100,states:OPEN,baseRefName:$b){nodes{'
+         'number createdAt body isInMergeQueue autoMergeRequest{enabledAt} labels(first:10){nodes{name}} '
+         'commits(last:1){nodes{commit{statusCheckRollup{state} checkSuites(first:20){totalCount}}}} '
+         'timelineItems(last:5,itemTypes:[REMOVED_FROM_MERGE_QUEUE_EVENT]){nodes{... on RemovedFromMergeQueueEvent{reason createdAt}}}}}}}')
+    out = []
+    nowt = dt.datetime.now(dt.timezone.utc)
+    for p in policies:
+        branch = f"lock-{p}"
+        res = json.loads(run(["gh", "api", "graphql", "-f", f"query={q}", "-f", f"o={OWNER}", "-f", f"r={REPO}", "-f", f"b={branch}"]))
+        for n in res["data"]["repository"]["pullRequests"]["nodes"]:
+            if any(l["name"] == "held" for l in n["labels"]["nodes"]) or n["isInMergeQueue"]:
+                continue
+            age = (nowt - dt.datetime.strptime(n["createdAt"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)).total_seconds()
+            commit = n["commits"]["nodes"][0]["commit"]
+            rollup = (commit.get("statusCheckRollup") or {}).get("state")
+            suites = commit["checkSuites"]["totalCount"]
+            removed = n["timelineItems"]["nodes"]
+            if n["autoMergeRequest"] and rollup in (None, "PENDING", "EXPECTED") and (suites > 0 or age < 300):
+                continue  # still on its way into the queue
+            if removed:
+                reason = f"removed from merge queue: {removed[-1]['reason']}"
+            elif suites == 0:
+                reason = "no check suite on the head commit (pull_request event not delivered)"
+            elif rollup in ("FAILURE", "ERROR"):
+                reason = f"lock-check {rollup.lower()}"
+            elif not n["autoMergeRequest"]:
+                reason = "not queued and not waiting to be queued"
+            else:
+                continue
+            m = meta_of(n["body"])
+            run(["gh", "pr", "close", str(n["number"]), "-R", f"{OWNER}/{REPO}", "--comment",
+                 f"Closed by the sweep: {reason}. Recomputing {m.get('event_module')} against the current {branch}."], check=False)
+            api(f"repos/{OWNER}/{REPO}/dispatches", "POST",
+                ["-f", "event_type=recompute", "-f", f"client_payload[module]={m.get('event_module')}", "-f", f"client_payload[policies]={p}"])
+            out.append({"t": now(), "policy": p, "pr": n["number"], "reason": reason, "recompute": m.get("event_module")})
+    return out
+
+
 def queue_event(number: int, action: str) -> None:
     p = api(f"repos/{OWNER}/{REPO}/pulls/{number}")
     m = meta_of(p["body"])
@@ -356,6 +427,8 @@ def main() -> None:
     q = sub.add_parser("queue-event")
     q.add_argument("--pr", type=int, required=True)
     q.add_argument("--action", required=True, choices=["dequeued", "closed"])
+    w = sub.add_parser("sweep")
+    w.add_argument("--policies", default="a,d,e")
     s = sub.add_parser("assemble")
     s.add_argument("--dir", required=True)
     s.add_argument("--out", required=True)
@@ -365,6 +438,12 @@ def main() -> None:
     if a.cmd == "assemble":
         lock, _ = read_lock(Path(a.dir))
         Path(a.out).write_text(json.dumps(lock), encoding="utf-8")
+        return
+    if a.cmd == "sweep":
+        recs = sweep([x.strip() for x in a.policies.split(",") if x.strip()])
+        print(json.dumps({"sweep": recs}, sort_keys=True))
+        if os.environ.get("GITHUB_STEP_SUMMARY"):
+            Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(json.dumps(recs, indent=1) + "\n", encoding="utf-8")
         return
     if a.cmd == "queue-event":
         queue_event(a.pr, a.action)
