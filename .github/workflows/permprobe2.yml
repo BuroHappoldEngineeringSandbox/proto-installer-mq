@@ -1,0 +1,72 @@
+name: permprobe2
+run-name: permprobe2 PR ${{ inputs.pr }}
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        required: true
+permissions: {}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - id: pr_mq
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-pull-requests: write
+          permission-merge-queues: write
+      - id: c_pr
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-contents: write
+          permission-pull-requests: write
+      - id: c_mq
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-contents: write
+          permission-merge-queues: write
+      - id: c_only
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+          permission-contents: write
+      - id: full
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PROTO_INTEGRATOR_APP_ID }}
+          private-key: ${{ secrets.PROTO_INTEGRATOR_PRIVATE_KEY }}
+          owner: BuroHappoldEngineeringSandbox
+          repositories: proto-installer-mq
+      - env:
+          T_pr_mq: ${{ steps.pr_mq.outputs.token }}
+          T_c_pr: ${{ steps.c_pr.outputs.token }}
+          T_c_mq: ${{ steps.c_mq.outputs.token }}
+          T_c_only: ${{ steps.c_only.outputs.token }}
+          T_full: ${{ steps.full.outputs.token }}
+          PR: ${{ inputs.pr }}
+          R: BuroHappoldEngineeringSandbox/proto-installer-mq
+        run: |
+          set +e
+          state() { GH_TOKEN=$T_full gh api graphql -f query='query($n:Int!){repository(owner:"BuroHappoldEngineeringSandbox",name:"proto-installer-mq"){pullRequest(number:$n){state isInMergeQueue autoMergeRequest{enabledAt}}}}' -F n=$PR --jq '.data.repository.pullRequest|"state=\(.state) inQueue=\(.isInMergeQueue) autoMerge=\(.autoMergeRequest!=null)"'; }
+          echo "PROBE start: $(state)"
+          for t in pr_mq c_pr c_mq c_only; do
+            tok=T_$t; out=$(GH_TOKEN=${!tok} gh pr merge $PR -R $R --auto 2>&1); rc=$?
+            echo "PROBE token=$t rc=$rc out=$out"; echo "PROBE after $t: $(state)"
+            if [ $rc -eq 0 ]; then d=$(GH_TOKEN=$T_full gh pr merge $PR -R $R --disable-auto 2>&1); echo "PROBE undo disable-auto rc=$? out=$d"; q=$(GH_TOKEN=$T_full gh api graphql -f query='mutation($id:ID!){dequeuePullRequest(input:{id:$id}){clientMutationId}}' -f id=$(GH_TOKEN=$T_full gh pr view $PR -R $R --json id --jq .id) 2>&1); echo "PROBE undo dequeue out=$q"; echo "PROBE after undo: $(state)"; fi
+          done
+          out=$(GH_TOKEN=$T_full gh pr merge $PR -R $R --auto 2>&1); echo "PROBE token=full rc=$? out=$out"; echo "PROBE final: $(state)"
